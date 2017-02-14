@@ -1,1 +1,0 @@
-/home/nirtepo/OpenCV/workbench/OpenCVTutorial/CMakeFiles/DisplayImage.dir

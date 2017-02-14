@@ -15,16 +15,16 @@ void mlp(cv::Mat& trainingData, std::vector<int>& index)
     layerSizes.row(1) = cv::Scalar(hidden_neurons);
     layerSizes.row(2) = cv::Scalar(output_neurons);
 
-    cv::Ptr<ml::ANN_MLP> mlp = ml::ANN_MLP::create();
+    cv::Ptr<cv::ml::ANN_MLP> mlp = cv::ml::ANN_MLP::create();
     mlp->setLayerSizes(layerSizes);
-    mlp->setTrainMethod(ml::ANN_MLP::SIGMOID_SYM);
-    mlp->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 1000, 0.00001f));
-    mlp->setTrainMethod(ml::ANN_MLP::BACKPROP,0.1f,0.1f);
-    mlp->setActivationFunction(ml::ANN_MLP::SIGMOID_SYM, 1, 1);
+    mlp->setTrainMethod(cv::ml::ANN_MLP::SIGMOID_SYM);
+    mlp->setTermCriteria(cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 1000, 0.00001f));
+    mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP,0.1f,0.1f);
+    mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM, 1, 1);
 
     cv::Mat trainClasses;
 
-    std::cout << "Poker" << endl;
+    std::cout << "Poker" << std::endl;
     trainClasses = cv::Mat::zeros(trainingData.rows, 12, CV_32FC1);
     //trainClasses.create(trainingData.rows, 12, CV_32FC1);
     for (int i = 0; i < trainClasses.rows; i++)
@@ -32,12 +32,12 @@ void mlp(cv::Mat& trainingData, std::vector<int>& index)
         trainClasses.at<float>(i, index[i]) = 1.f;
     }
 
-    std::cout << "Row of trainClass: " << trainClasses.cols << endl;
-    std::cout << "Row of trainData: " << trainingData.cols << endl;
-    std::cout << "Koker" << endl;
-    cv::Ptr<ml::TrainData> td = ml::TrainData::create(trainingData, ml::ROW_SAMPLE, trainClasses);
+    std::cout << "Row of trainClass: " << trainClasses.cols << std::endl;
+    std::cout << "Row of trainData: " << trainingData.cols << std::endl;
+    std::cout << "Koker" << std::endl;
+    cv::Ptr<cv::ml::TrainData> td = cv::ml::TrainData::create(trainingData, cv::ml::ROW_SAMPLE, trainClasses);
     mlp->train(td);
-    std::cout << "Training Done" << endl;
+    std::cout << "Training Done" << std::endl;
 
     mlp->save("neural_network.xml");
 
@@ -60,12 +60,11 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, co
 
 int main(int argc, char** argv )
 {
-	int networkInputSize = atoi(argv[2]);
 	cv::Mat trainSamples;
   	cv::Mat trainResponses;
 	
-	cv::ml::ANN_MLP *mlp;
-	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(networkInputSize,trainSamples, trainResponses);
+	//cv::ml::ANN_MLP *mlp;
+	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(trainSamples, trainResponses);
 
 	//cv::ANN_MLP_TrainParams *params;
 
