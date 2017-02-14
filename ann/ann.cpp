@@ -1,8 +1,48 @@
 #include <stdio.h>
 #include <vector>
+#include <iostream>
 #include <opencv2/opencv.hpp>
 #include "cv.h"
 #include "ml.h"
+
+void mlp(cv::Mat& trainingData, std::vector<int>& index)
+{
+    int input_neurons = 8;
+    int hidden_neurons = 100;
+    int output_neurons = 12;
+    cv::Mat layerSizes = cv::Mat(3, 1, CV_32SC1);
+    layerSizes.row(0) = cv::Scalar(input_neurons);
+    layerSizes.row(1) = cv::Scalar(hidden_neurons);
+    layerSizes.row(2) = cv::Scalar(output_neurons);
+
+    cv::Ptr<ml::ANN_MLP> mlp = ml::ANN_MLP::create();
+    mlp->setLayerSizes(layerSizes);
+    mlp->setTrainMethod(ml::ANN_MLP::SIGMOID_SYM);
+    mlp->setTermCriteria(TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 1000, 0.00001f));
+    mlp->setTrainMethod(ml::ANN_MLP::BACKPROP,0.1f,0.1f);
+    mlp->setActivationFunction(ml::ANN_MLP::SIGMOID_SYM, 1, 1);
+
+    cv::Mat trainClasses;
+
+    std::cout << "Poker" << endl;
+    trainClasses = cv::Mat::zeros(trainingData.rows, 12, CV_32FC1);
+    //trainClasses.create(trainingData.rows, 12, CV_32FC1);
+    for (int i = 0; i < trainClasses.rows; i++)
+    {
+        trainClasses.at<float>(i, index[i]) = 1.f;
+    }
+
+    std::cout << "Row of trainClass: " << trainClasses.cols << endl;
+    std::cout << "Row of trainData: " << trainingData.cols << endl;
+    std::cout << "Koker" << endl;
+    cv::Ptr<ml::TrainData> td = ml::TrainData::create(trainingData, ml::ROW_SAMPLE, trainClasses);
+    mlp->train(td);
+    std::cout << "Training Done" << endl;
+
+    mlp->save("neural_network.xml");
+
+}
+
 
 
 cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, const cv::Mat& trainResponses)
@@ -20,7 +60,13 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, co
 
 int main(int argc, char** argv )
 {
+	int networkInputSize = atoi(argv[2]);
+	cv::Mat trainSamples;
+  	cv::Mat trainResponses;
+	
 	cv::ml::ANN_MLP *mlp;
+	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(networkInputSize,trainSamples, trainResponses);
+
 	//cv::ANN_MLP_TrainParams *params;
 
 /*class Ann : public cv::ml::ANN_MLP{
