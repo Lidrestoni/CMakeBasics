@@ -7,7 +7,7 @@
 
 
 
-void mlp(cv::Mat& trainingData, std::vector<int>& index)
+/*void mlp(cv::Mat& trainingData, std::vector<int>& index)
 {
     int input_neurons = 8;
     int hidden_neurons = 100;
@@ -43,11 +43,11 @@ void mlp(cv::Mat& trainingData, std::vector<int>& index)
 
     mlp->save("neural_network.xml");
 
-}
+}*/
 
 
 
-cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, const cv::Mat& trainResponses)
+cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat_<double>& trainSamples, const cv::Mat_<double>& trainResponses)
 {
   int networkInputSize = trainSamples.cols;
   int networkOutputSize = trainResponses.cols;
@@ -55,65 +55,34 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, co
   std::vector<int> layerSizes = { networkInputSize, networkInputSize / 2, networkOutputSize };
   mlp->setLayerSizes(layerSizes);
   mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
-  mlp->train(trainSamples, cv::ml::ROW_SAMPLE, trainResponses);
+  //mlp->train(trainSamples, cv::ml::ROW_SAMPLE, trainResponses);
+mlp->train(trainSamples, cv::ml::ROW_SAMPLE, trainSamples);
   return mlp;
 }
 
 
 int main(int argc, char** argv )
 {
-	cv::Mat trainSamples;
-	cv::Mat trainResponses;
+	cv::Mat_<double> trainSamples(1, 10, CV_32FC1);
+	cv::Mat_<double> trainResponses(1, 1, CV_32FC1);
 	trainSamples.reserve(4000);
 	trainResponses.reserve(4000);
-	int in[11], out;
-	std::vector<int> v;
-	cv::Mat vv;
-	int a=0;
-	while(scanf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){
-		
-			/*v = std::vector<int>(std::begin(in), std::end(in));
-			cv::transpose(v,v);
-			vv = cv::Mat(v);
-			trainSamples.push_back(vv);
-			v = std::vector<int>(out);
-			vv = cv::Mat(v);
-			trainResponses.push_back(vv);*/
-			vv = cv::Mat(1, 10, CV_32SC1);
-			vv.reserve(2);
+	double in[11], out;
+	cv::Mat_<double> mat;
+	while(scanf("%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf\n", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){ //printf("%lf\n", in[0]);
+			mat = cv::Mat_<double>(1, 10, CV_32FC1);
+			mat.reserve(2);
 			for(int i=0; i<10;i++)
-				vv.at<int>(0,i) = in[i];
-			trainSamples.push_back(vv);
-			
-			/*std::cout<<trainSamples.at<int>(cv::Point(a,0))<<","<<trainSamples.at<int>(cv::Point(a,1))<<","<<trainSamples.at<int>(cv::Point(a,2))<<","<<trainSamples.at<int>(cv::Point(a,3))<<","<<trainSamples.at<int>(cv::Point(a,4))<<","<<trainSamples.at<int>(cv::Point(a,5))<<","<<trainSamples.at<int>(cv::Point(a,6))<<","<<trainSamples.at<int>(cv::Point(a,7))<<","<<trainSamples.at<int>(cv::Point(a,8))<<","<<trainSamples.at<int>(cv::Point(a,9))<<"["<<trainResponses.at<int>(a)<<"]"<<std::endl;*/
-		a++;
+				mat.at<double>(0,i) = in[i];
+			trainSamples.push_back(mat);
+			mat = cv::Mat_<double>(1, 1, CV_32FC1);
+			mat.reserve(2);
+			mat.at<double>(0,0) = out;
+			trainResponses.push_back(mat);
+			//printf("%lf\n", trainSamples.at<double>(cv::Point(0,0)));
 	}
-	std::cout<<std::endl<<trainSamples;
-
-
-	//trainSamples.push_back(v);
-	//std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<","<<v[4]<<","<<v[5]<<","<<v[6]<<","<<v[7]<<","<<v[8]<<","<<v[9]<<"]"<<std::endl<<std::endl;
-	/*cv::Mat trainSamples(v);
-	trainSamples.reserve(4000);
-	trainSamples.push_back(v);
-	std::cout<<trainSamples.at<int>(cv::Point(0,1))<<"!"<<std::endl;
-	v = std::vector<int>(out);
-	cv::Mat trainResponses(v);*/
-	//scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out);v = std::vector<int>(std::begin(in), std::end(in));trainSamples.push_back(v);
-	/*while(scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){if(a++>0) break;
-		v = std::vector<int>(std::begin(in), std::end(in));
-		trainSamples.push_back(v);		
-	}*/
-	
-  	//cv::Mat trainResponses;
-	
-	//cv::ml::ANN_MLP *mlp;
-	//cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(trainSamples, trainResponses);
-	/*while(scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){
-		//printf("\n>>%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d<<\n\n ", in[0], in[1], in[2], in[3], in[4], in[5], in[6], in[7], in[8], in[9], out);	
-		std::vector<int> v(std::begin(in), std::end(in));
-		trainSamples.push_back(v);
-		//trainResponses.push_back(out);*/	
+	std::cout <<trainSamples;
+	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(trainSamples, trainResponses);
 
 	//cv::ANN_MLP_TrainParams *params;
 
