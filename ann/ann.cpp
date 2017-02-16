@@ -12,6 +12,18 @@
 #include <ctime>  
 #include <cstdlib> 
 
+double abs(double x){
+	return x<0? -x : x;
+}
+
+double outputSuccessRate(const cv::Mat &are,const cv::Mat &shouldBe){
+	int s=0;	
+	for (int i = 0; i < are.rows; i++)
+		s+=(abs(shouldBe.at<float>(i,0)-are.at<float>(i,0))<0.6); 
+	return (double) s/are.rows;
+}
+
+
 cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat_<float>& trainSamples, const cv::Mat_<float>& trainResponses){
 	int networkInputSize = trainSamples.cols; 
 	int networkOutputSize = trainResponses.cols;
@@ -65,9 +77,10 @@ int main(int argc, char** argv ){
 	cv::Mat_<float> originalInput, originalOutput, trainingInput, trainingOutput;
 	FILEtoMAT((char *)"data", originalInput, originalOutput);
 	shuffleMatRows(originalInput, originalOutput, trainingInput, trainingOutput);
-	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(originalInput, originalOutput);
+	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(trainingInput, trainingOutput);
 	cv::Mat_<float> temp(1, 1, CV_32FC1);
 	mlp->predict(originalInput, temp);
+	printf(">>%.2lf%% de acertos<<\n", outputSuccessRate(temp, originalOutput)*100);
 
 	return 0;
 }
