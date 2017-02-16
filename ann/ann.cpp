@@ -82,19 +82,24 @@ int main(int argc, char** argv ){
 	cv::Ptr<cv::ml::ANN_MLP> mlp;
 	double predictedBOSR,bestOSR = 0;
 	FILEtoMAT((char *)"data", trainingInput, trainingOutput);
-	shuffleMatRows(trainingInput, trainingOutput);
-	mlp = getTrainedNeuralNetwork(trainingInput, trainingOutput);
-	forPredictionInput = trainingInput.clone();
-	forPredictionOutput = trainingOutput.clone();
-	shuffleMatRows(forPredictionInput,forPredictionOutput);
-	predictedOutput = cv::Mat_<float>(1, 1, CV_32FC1);
-	mlp->predict(forPredictionInput, predictedOutput);
-	predictedBOSR = outputSuccessRate(predictedOutput, forPredictionOutput);
-	if(predictedBOSR>bestOSR){
-		bestOSR = predictedBOSR;
-		bestInput = trainingInput.clone();
-		bestOutput = trainingOutput.clone();	
-		printf(">>%.2lf%% de acertos<<\n", bestOSR*100);
+	int i=3000;
+	while(i--){	
+		shuffleMatRows(trainingInput, trainingOutput);
+		mlp = getTrainedNeuralNetwork(trainingInput, trainingOutput);
+		forPredictionInput = trainingInput.clone();
+		forPredictionOutput = trainingOutput.clone();
+		shuffleMatRows(forPredictionInput,forPredictionOutput);
+		if(i<1500){		
+			predictedOutput = cv::Mat_<float>(1, 1, CV_32FC1);
+			mlp->predict(forPredictionInput, predictedOutput);
+			predictedBOSR = outputSuccessRate(predictedOutput, forPredictionOutput);
+			if(predictedBOSR>bestOSR){
+				bestOSR = predictedBOSR;
+				bestInput = trainingInput.clone();
+				bestOutput = trainingOutput.clone();	
+				printf(">>%.2lf%% de acertos<<\n", bestOSR*100);
+			}
+		}
 	}
 
 	return 0;
