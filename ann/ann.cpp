@@ -5,14 +5,7 @@
 #include "cv.h"
 #include "ml.h"
 
-using namespace cv;
-using namespace std;
 
-#include <opencv2/gpu/gpu.hpp>
- #include "opencv2/gpu/gpumat.hpp"
- #include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
- 
 
 void mlp(cv::Mat& trainingData, std::vector<int>& index)
 {
@@ -77,21 +70,23 @@ int main(int argc, char** argv )
 	std::vector<int> v;
 	cv::Mat vv;
 	int a=0;
-	int temp=0;
 	while(scanf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){
-		temp%=10;
-		if(temp==0){
-			v = std::vector<int>(std::begin(in), std::end(in));
+		
+			/*v = std::vector<int>(std::begin(in), std::end(in));
+			cv::transpose(v,v);
 			vv = cv::Mat(v);
-			vv = gpu::transpose(vv);
 			trainSamples.push_back(vv);
 			v = std::vector<int>(out);
 			vv = cv::Mat(v);
-			trainResponses.push_back(vv);
-			std::cout<<trainSamples.at<int>(cv::Point(a,0))<<","<<trainSamples.at<int>(cv::Point(a,1))<<","<<trainSamples.at<int>(cv::Point(a,2))<<","<<trainSamples.at<int>(cv::Point(a,3))<<","<<trainSamples.at<int>(cv::Point(a,4))<<","<<trainSamples.at<int>(cv::Point(a,5))<<","<<trainSamples.at<int>(cv::Point(a,6))<<","<<trainSamples.at<int>(cv::Point(a,7))<<","<<trainSamples.at<int>(cv::Point(a,8))<<","<<trainSamples.at<int>(cv::Point(a,9))<<"["<<trainResponses.at<int>(a)<<"]"<<std::endl;
+			trainResponses.push_back(vv);*/
+			vv = cv::Mat(1, 10, CV_32SC1);
+			vv.reserve(2);
+			for(int i=0; i<10;i++)
+				vv.at<int>(0,i) = in[i];
+			trainSamples.push_back(vv);
+			
+			/*std::cout<<trainSamples.at<int>(cv::Point(a,0))<<","<<trainSamples.at<int>(cv::Point(a,1))<<","<<trainSamples.at<int>(cv::Point(a,2))<<","<<trainSamples.at<int>(cv::Point(a,3))<<","<<trainSamples.at<int>(cv::Point(a,4))<<","<<trainSamples.at<int>(cv::Point(a,5))<<","<<trainSamples.at<int>(cv::Point(a,6))<<","<<trainSamples.at<int>(cv::Point(a,7))<<","<<trainSamples.at<int>(cv::Point(a,8))<<","<<trainSamples.at<int>(cv::Point(a,9))<<"["<<trainResponses.at<int>(a)<<"]"<<std::endl;*/
 		a++;
-		}
-		temp++;
 	}
 	std::cout<<std::endl<<trainSamples;
 
