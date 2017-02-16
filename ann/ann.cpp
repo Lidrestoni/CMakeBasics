@@ -30,6 +30,10 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat_<float>& trainSam
 	cv::Ptr<cv::ml::ANN_MLP> mlp = cv::ml::ANN_MLP::create();
 	std::vector<int> layerSizes = { networkInputSize, networkInputSize / 2, networkOutputSize };
 	mlp->setLayerSizes(layerSizes);
+	mlp->setTrainMethod(cv::ml::ANN_MLP::BACKPROP);
+	//mlp->setBackpropMomentumScale(0.1);
+	//mlp->setBackpropWeightScale(0.1);
+	//mlp->setTermCriteria(cv::TermCriteria(cv::TermCriteria::MAX_ITER, (int)100000, 1e-6));
 	mlp->setActivationFunction(cv::ml::ANN_MLP::SIGMOID_SYM);
 	mlp->train(trainSamples, cv::ml::ROW_SAMPLE, trainResponses);
 	return mlp;
@@ -89,7 +93,7 @@ int main(int argc, char** argv ){
 		forPredictionInput = trainingInput.clone();
 		forPredictionOutput = trainingOutput.clone();
 		shuffleMatRows(forPredictionInput,forPredictionOutput);
-		if(i<1500){		
+		//if(i<1500){		
 			predictedOutput = cv::Mat_<float>(1, 1, CV_32FC1);
 			mlp->predict(forPredictionInput, predictedOutput);
 			predictedBOSR = outputSuccessRate(predictedOutput, forPredictionOutput);
@@ -99,7 +103,7 @@ int main(int argc, char** argv ){
 				bestOutput = trainingOutput.clone();	
 				printf(">>%.2lf%% de acertos<<\n", bestOSR*100);
 			}
-		}
+		//}
 	}
 
 	return 0;
