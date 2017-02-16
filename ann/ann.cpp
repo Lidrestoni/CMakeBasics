@@ -58,29 +58,44 @@ void FILEtoMAT(char *name, cv::Mat_<float>& input, cv::Mat_<float>& output){
 	fclose(file);
 }
 
-void shuffleMatRows(const cv::Mat &origInput, const cv::Mat &origOutput, cv::Mat &shuffInput, cv::Mat &shuffOutput){
+void shuffleMatRows(cv::Mat &Input, cv::Mat &Output){
 /*Essa função cria um vetor, no qual são colocados números de bilhetes de 0 a n-1 (onde n é o número de linha de uma das matrizes de origem, pois ambas devem ter o mesmo número de linhas).
 * Então esses números são embaralhados, e as matrizes de saída são montadas seguindo essa ordem de bilhetes sorteados
 */
 	std::vector <int> tickets;
-	for (int i = 0; i < origInput.rows; i++)
+	cv::Mat_<float>input2(1, 10, CV_32FC1);
+	cv::Mat_<float>output2(1, 1, CV_32FC1);
+	for (int i = 0; i < Input.rows; i++)
 		tickets.push_back(i);
 	std::srand ( unsigned ( std::time(0) ) );
 	std::random_shuffle ( tickets.begin(), tickets.end() );
-	for (int i = 0; i < origInput.rows; i++){
-		shuffInput.push_back(origInput.row(tickets[i]));
-		shuffOutput.push_back(origOutput.row(tickets[i]));
+	for (int i = 0; i < Input.rows; i++){
+		input2.push_back(Input.row(tickets[i]));
+		output2.push_back(Output.row(tickets[i]));
 	}
+	Input = input2.clone();
+	Output = output2.clone();
 }
 
 int main(int argc, char** argv ){	
-	cv::Mat_<float> originalInput, originalOutput, trainingInput, trainingOutput;
-	FILEtoMAT((char *)"data", originalInput, originalOutput);
-	shuffleMatRows(originalInput, originalOutput, trainingInput, trainingOutput);
-	cv::Ptr<cv::ml::ANN_MLP> mlp = getTrainedNeuralNetwork(trainingInput, trainingOutput);
-	cv::Mat_<float> temp(1, 1, CV_32FC1);
-	mlp->predict(originalInput, temp);
-	printf(">>%.2lf%% de acertos<<\n", outputSuccessRate(temp, originalOutput)*100);
+	cv::Mat_<float> bestInput, bestOutput, trainingInput, trainingOutput,forPredictionInput, forPredictionOutput, predictedOutput;
+	cv::Ptr<cv::ml::ANN_MLP> mlp;
+	double predictedBOSR,bestOSR = 0;
+	FILEtoMAT((char *)"data", trainingInput, trainingOutput);
+	shuffleMatRows(trainingInput, trainingOutput);
+	mlp = getTrainedNeuralNetwork(trainingInput, trainingOutput);
+	forPredictionInput = trainingInput.clone();
+	forPredictionOutput = trainingOutput.clone();
+	shuffleMatRows(forPredictionInput,forPredictionOutput);
+	predictedOutput = cv::Mat_<float>(1, 1, CV_32FC1);
+	mlp->predict(forPredictionInput, predictedOutput);
+	predictedBOSR = outputSuccessRate(predictedOutput, forPredictionOutput);
+	if(predictedBOSR>bestOSR){
+		bestOSR = predictedBOSR;
+		bestInput = trainingInput.clone();
+		bestOutput = trainingOutput.clone();	
+		printf(">>%.2lf%% de acertos<<\n", bestOSR*100);
+	}
 
 	return 0;
 }
