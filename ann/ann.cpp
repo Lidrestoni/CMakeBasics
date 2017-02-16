@@ -5,6 +5,15 @@
 #include "cv.h"
 #include "ml.h"
 
+using namespace cv;
+using namespace std;
+
+#include <opencv2/gpu/gpu.hpp>
+ #include "opencv2/gpu/gpumat.hpp"
+ #include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+ 
+
 void mlp(cv::Mat& trainingData, std::vector<int>& index)
 {
     int input_neurons = 8;
@@ -60,16 +69,41 @@ cv::Ptr<cv::ml::ANN_MLP> getTrainedNeuralNetwork(const cv::Mat& trainSamples, co
 
 int main(int argc, char** argv )
 {
+	cv::Mat trainSamples;
+	cv::Mat trainResponses;
+	trainSamples.reserve(4000);
+	trainResponses.reserve(4000);
 	int in[11], out;
-	scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out);
-	std::vector<int> v(std::begin(in), std::end(in));
-	std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<","<<v[4]<<","<<v[5]<<","<<v[6]<<","<<v[7]<<","<<v[8]<<","<<v[9]<<std::endl<<std::endl;
-	cv::Mat trainSamples(v);
+	std::vector<int> v;
+	cv::Mat vv;
+	int a=0;
+	int temp=0;
+	while(scanf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){
+		temp%=10;
+		if(temp==0){
+			v = std::vector<int>(std::begin(in), std::end(in));
+			vv = cv::Mat(v);
+			vv = gpu::transpose(vv);
+			trainSamples.push_back(vv);
+			v = std::vector<int>(out);
+			vv = cv::Mat(v);
+			trainResponses.push_back(vv);
+			std::cout<<trainSamples.at<int>(cv::Point(a,0))<<","<<trainSamples.at<int>(cv::Point(a,1))<<","<<trainSamples.at<int>(cv::Point(a,2))<<","<<trainSamples.at<int>(cv::Point(a,3))<<","<<trainSamples.at<int>(cv::Point(a,4))<<","<<trainSamples.at<int>(cv::Point(a,5))<<","<<trainSamples.at<int>(cv::Point(a,6))<<","<<trainSamples.at<int>(cv::Point(a,7))<<","<<trainSamples.at<int>(cv::Point(a,8))<<","<<trainSamples.at<int>(cv::Point(a,9))<<"["<<trainResponses.at<int>(a)<<"]"<<std::endl;
+		a++;
+		}
+		temp++;
+	}
+	std::cout<<std::endl<<trainSamples;
+
+
+	//trainSamples.push_back(v);
+	//std::cout<<"["<<v[0]<<","<<v[1]<<","<<v[2]<<","<<v[3]<<","<<v[4]<<","<<v[5]<<","<<v[6]<<","<<v[7]<<","<<v[8]<<","<<v[9]<<"]"<<std::endl<<std::endl;
+	/*cv::Mat trainSamples(v);
 	trainSamples.reserve(4000);
 	trainSamples.push_back(v);
 	std::cout<<trainSamples.at<int>(cv::Point(0,1))<<"!"<<std::endl;
 	v = std::vector<int>(out);
-	cv::Mat trainResponses(v);
+	cv::Mat trainResponses(v);*/
 	//scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out);v = std::vector<int>(std::begin(in), std::end(in));trainSamples.push_back(v);
 	/*while(scanf("%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d ", &in[0], &in[1], &in[2], &in[3], &in[4], &in[5], &in[6], &in[7], &in[8], &in[9], &out)!=EOF){if(a++>0) break;
 		v = std::vector<int>(std::begin(in), std::end(in));
